@@ -56,20 +56,11 @@ namespace StitchFluentOcrPro.PDF
 
                             try
                             {
-                                int imgW = (int)Math.Max(1, pageResult.ImageWidthPixels);
-                                int imgH = (int)Math.Max(1, pageResult.ImageHeightPixels);
-                                page.AddImage(pageResult.RenderedImageBytes, imgW, imgH, placement);
+                                page.AddJpeg(pageResult.RenderedImageBytes, placement);
                             }
                             catch
                             {
-                                try
-                                {
-                                    page.AddJpeg(pageResult.RenderedImageBytes, placement);
-                                }
-                                catch
-                                {
-                                    page.AddPng(pageResult.RenderedImageBytes, placement);
-                                }
+                                page.AddPng(pageResult.RenderedImageBytes, placement);
                             }
                         }
 
