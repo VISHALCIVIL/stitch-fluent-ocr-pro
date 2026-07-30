@@ -2,14 +2,13 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.Data.Pdf;
-using Windows.Storage;
 using Windows.Storage.Streams;
 using StitchFluentOcrPro.Logging;
 
 namespace StitchFluentOcrPro.PDF
 {
     /// <summary>
-    /// High-speed native PDF rendering service using Windows.Data.Pdf APIs.
+    /// High-speed native PDF rendering service using Windows.Data.Pdf APIs with stream safety.
     /// </summary>
     public class WindowsPdfRendererService : IPdfRendererService
     {
@@ -22,23 +21,26 @@ namespace StitchFluentOcrPro.PDF
 
         public async Task<int> GetPageCountAsync(string pdfPath)
         {
-            StorageFile file = await StorageFile.GetFileFromPathAsync(Path.GetFullPath(pdfPath));
-            PdfDocument doc = await PdfDocument.LoadFromFileAsync(file);
+            using FileStream fileStream = File.OpenRead(Path.GetFullPath(pdfPath));
+            using IRandomAccessStream winRtStream = fileStream.AsRandomAccessStream();
+            PdfDocument doc = await PdfDocument.LoadFromStreamAsync(winRtStream);
             return (int)doc.PageCount;
         }
 
         public async Task<(double widthPoints, double heightPoints)> GetPageDimensionsAsync(string pdfPath, int pageIndex)
         {
-            StorageFile file = await StorageFile.GetFileFromPathAsync(Path.GetFullPath(pdfPath));
-            PdfDocument doc = await PdfDocument.LoadFromFileAsync(file);
+            using FileStream fileStream = File.OpenRead(Path.GetFullPath(pdfPath));
+            using IRandomAccessStream winRtStream = fileStream.AsRandomAccessStream();
+            PdfDocument doc = await PdfDocument.LoadFromStreamAsync(winRtStream);
             using PdfPage page = doc.GetPage((uint)pageIndex);
             return (page.Size.Width, page.Size.Height);
         }
 
         public async Task<MemoryStream> RenderPageToImageStreamAsync(string pdfPath, int pageIndex, int dpi = 300)
         {
-            StorageFile file = await StorageFile.GetFileFromPathAsync(Path.GetFullPath(pdfPath));
-            PdfDocument doc = await PdfDocument.LoadFromFileAsync(file);
+            using FileStream fileStream = File.OpenRead(Path.GetFullPath(pdfPath));
+            using IRandomAccessStream winRtStream = fileStream.AsRandomAccessStream();
+            PdfDocument doc = await PdfDocument.LoadFromStreamAsync(winRtStream);
             using PdfPage page = doc.GetPage((uint)pageIndex);
 
             var options = new PdfPageRenderOptions();

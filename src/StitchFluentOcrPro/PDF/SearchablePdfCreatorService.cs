@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UglyToad.PdfPig.Content;
 using UglyToad.PdfPig.Core;
@@ -80,9 +81,19 @@ namespace StitchFluentOcrPro.PDF
                                     position,
                                     font);
                             }
-                            catch (Exception ex)
+                            catch
                             {
-                                _logger.LogWarning($"Failed to place OCR word '{word.Text}' on page {pageResult.PageIndex}: {ex.Message}");
+                                try
+                                {
+                                    string cleanText = Regex.Replace(word.Text, @"[^\u0000-\u007F]+", " ");
+                                    if (!string.IsNullOrWhiteSpace(cleanText))
+                                    {
+                                        var position = new PdfPoint(word.PdfX, word.PdfY);
+                                        double fontSize = Math.Clamp(word.FontSize, 4.0, 72.0);
+                                        page.AddText(cleanText, fontSize, position, font);
+                                    }
+                                }
+                                catch { }
                             }
                         }
                     }

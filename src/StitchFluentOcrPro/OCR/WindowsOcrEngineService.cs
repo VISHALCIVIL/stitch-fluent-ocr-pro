@@ -77,7 +77,7 @@ namespace StitchFluentOcrPro.OCR
 
             using SoftwareBitmap softwareBitmap = await decoder.GetSoftwareBitmapAsync(
                 BitmapPixelFormat.Bgra8, 
-                BitmapAlphaMode.Premultiplied);
+                BitmapAlphaMode.Ignore);
 
             // Initialize Windows OcrEngine
             OcrEngine? engine = null;
