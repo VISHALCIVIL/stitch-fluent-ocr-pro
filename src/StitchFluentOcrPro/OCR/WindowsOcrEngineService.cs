@@ -16,10 +16,12 @@ namespace StitchFluentOcrPro.OCR
 {
     /// <summary>
     /// High-performance offline OCR engine wrapper over native Windows.Media.Ocr APIs.
+    /// Handles Windows OCR 2600-pixel dimension constraints automatically.
     /// </summary>
     public class WindowsOcrEngineService : IOcrEngineService
     {
         private readonly ILoggingService _logger;
+        private const uint MaxOcrDimension = 2560; // Windows.Media.Ocr MaxImageDimension constraint (2600)
 
         public WindowsOcrEngineService(ILoggingService logger)
         {
@@ -70,81 +72,113 @@ namespace StitchFluentOcrPro.OCR
 
             // Decode image into SoftwareBitmap required by Windows.Media.Ocr
             BitmapDecoder decoder = await BitmapDecoder.CreateAsync(winRtStream);
-            uint imgWidth = decoder.PixelWidth;
-            uint imgHeight = decoder.PixelHeight;
-            pageResult.ImageWidthPixels = imgWidth;
-            pageResult.ImageHeightPixels = imgHeight;
+            uint origWidth = decoder.PixelWidth;
+            uint origHeight = decoder.PixelHeight;
+            pageResult.ImageWidthPixels = origWidth;
+            pageResult.ImageHeightPixels = origHeight;
 
-            using SoftwareBitmap softwareBitmap = await decoder.GetSoftwareBitmapAsync(
-                BitmapPixelFormat.Bgra8, 
-                BitmapAlphaMode.Ignore);
+            // Check if image exceeds Windows OCR MaxImageDimension limit (2600px)
+            SoftwareBitmap softwareBitmap;
+            uint ocrWidth = origWidth;
+            uint ocrHeight = origHeight;
 
-            // Initialize Windows OcrEngine
-            OcrEngine? engine = null;
-            if (!string.IsNullOrWhiteSpace(languageTag))
+            if (origWidth > MaxOcrDimension || origHeight > MaxOcrDimension)
             {
-                try
+                double scale = Math.Min((double)MaxOcrDimension / origWidth, (double)MaxOcrDimension / origHeight);
+                ocrWidth = (uint)Math.Max(1, Math.Round(origWidth * scale));
+                ocrHeight = (uint)Math.Max(1, Math.Round(origHeight * scale));
+
+                var transform = new BitmapTransform
                 {
-                    var lang = new Language(languageTag);
-                    if (OcrEngine.IsLanguageSupported(lang))
+                    ScaledWidth = ocrWidth,
+                    ScaledHeight = ocrHeight,
+                    InterpolationMode = BitmapInterpolationMode.Linear
+                };
+
+                softwareBitmap = await decoder.GetSoftwareBitmapAsync(
+                    BitmapPixelFormat.Bgra8,
+                    BitmapAlphaMode.Premultiplied,
+                    transform,
+                    ExifOrientationMode.IgnoreExifOrientation,
+                    ColorManagementMode.DoNotColorManage);
+            }
+            else
+            {
+                softwareBitmap = await decoder.GetSoftwareBitmapAsync(
+                    BitmapPixelFormat.Bgra8,
+                    BitmapAlphaMode.Premultiplied);
+            }
+
+            using (softwareBitmap)
+            {
+                // Initialize Windows OcrEngine
+                OcrEngine? engine = null;
+                if (!string.IsNullOrWhiteSpace(languageTag))
+                {
+                    try
                     {
-                        engine = OcrEngine.TryCreateFromLanguage(lang);
+                        var lang = new Language(languageTag);
+                        if (OcrEngine.IsLanguageSupported(lang))
+                        {
+                            engine = OcrEngine.TryCreateFromLanguage(lang);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning($"Could not load OCR engine for language '{languageTag}': {ex.Message}");
                     }
                 }
-                catch (Exception ex)
+
+                engine ??= OcrEngine.TryCreateFromUserProfileLanguages();
+                if (engine == null)
                 {
-                    _logger.LogWarning($"Could not load OCR engine for language '{languageTag}': {ex.Message}. Falling back to default language.");
+                    var supported = OcrEngine.AvailableRecognizerLanguages.FirstOrDefault();
+                    if (supported != null)
+                    {
+                        engine = OcrEngine.TryCreateFromLanguage(supported);
+                    }
                 }
-            }
 
-            engine ??= OcrEngine.TryCreateFromUserProfileLanguages();
-            if (engine == null)
-            {
-                var supported = OcrEngine.AvailableRecognizerLanguages.FirstOrDefault();
-                if (supported != null)
+                if (engine == null)
                 {
-                    engine = OcrEngine.TryCreateFromLanguage(supported);
+                    throw new InvalidOperationException("No suitable Windows OCR language engine is available on this system.");
                 }
-            }
 
-            if (engine == null)
-            {
-                throw new InvalidOperationException("No suitable Windows OCR language engine is available on this system.");
-            }
+                // Perform OCR Recognition
+                OcrResult ocrResult = await engine.RecognizeAsync(softwareBitmap);
 
-            // Perform OCR Recognition
-            OcrResult ocrResult = await engine.RecognizeAsync(softwareBitmap);
+                var textBuilder = new StringBuilder();
+                var wordList = new List<OcrWordInfo>();
 
-            var textBuilder = new StringBuilder();
-            var wordList = new List<OcrWordInfo>();
-
-            foreach (OcrLine line in ocrResult.Lines)
-            {
-                textBuilder.AppendLine(line.Text);
-
-                foreach (OcrWord word in line.Words)
+                foreach (OcrLine line in ocrResult.Lines)
                 {
-                    var rect = word.BoundingRect;
-                    var wordInfo = OcrCoordinateConverter.ConvertPixelToPdfCoordinates(
-                        word.Text,
-                        rect.X,
-                        rect.Y,
-                        rect.Width,
-                        rect.Height,
-                        imgWidth,
-                        imgHeight,
-                        pageWidthPoints,
-                        pageHeightPoints,
-                        1.0f);
+                    textBuilder.AppendLine(line.Text);
 
-                    wordList.Add(wordInfo);
+                    foreach (OcrWord word in line.Words)
+                    {
+                        var rect = word.BoundingRect;
+                        var wordInfo = OcrCoordinateConverter.ConvertPixelToPdfCoordinates(
+                            word.Text,
+                            rect.X,
+                            rect.Y,
+                            rect.Width,
+                            rect.Height,
+                            ocrWidth,
+                            ocrHeight,
+                            pageWidthPoints,
+                            pageHeightPoints,
+                            1.0f);
+
+                        wordList.Add(wordInfo);
+                    }
                 }
+
+                pageResult.Words = wordList;
+                pageResult.ExtractedText = textBuilder.ToString();
+
+                _logger.LogInfo($"[OCR] Page {pageIndex + 1}: Recognized {wordList.Count} words.", "OCR");
+                return pageResult;
             }
-
-            pageResult.Words = wordList;
-            pageResult.ExtractedText = textBuilder.ToString();
-
-            return pageResult;
         }
     }
 }
