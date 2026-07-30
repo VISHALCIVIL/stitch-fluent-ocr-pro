@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Runtime.Versioning;
 using StitchFluentOcrPro.Models;
 
 namespace StitchFluentOcrPro.Services
@@ -55,8 +54,7 @@ namespace StitchFluentOcrPro.Services
         {
             try
             {
-                using var proc = Process.GetCurrentProcess();
-                return proc.WorkingSet64;
+                return GC.GetTotalMemory(false);
             }
             catch
             {

@@ -1,4 +1,5 @@
 using System;
+using StitchFluentOcrPro.Logging;
 using StitchFluentOcrPro.Services;
 using Xunit;
 
@@ -9,6 +10,7 @@ namespace StitchFluentOcrPro.Tests
         [Fact]
         public void CalculatePpm_ValidElapsedAndPages_ReturnsCorrectThroughput()
         {
+            var logger = new LoggingService();
             using var metricsService = new SystemMetricsService();
 
             int pages = 120;
@@ -22,6 +24,7 @@ namespace StitchFluentOcrPro.Tests
         [Fact]
         public void EstimateRemainingTime_ValidRemainingPagesAndPpm_ReturnsCorrectDuration()
         {
+            var logger = new LoggingService();
             using var metricsService = new SystemMetricsService();
 
             int remainingPages = 300;
