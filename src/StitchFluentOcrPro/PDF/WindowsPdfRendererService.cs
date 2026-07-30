@@ -49,8 +49,8 @@ namespace StitchFluentOcrPro.PDF
             options.DestinationWidth = (uint)Math.Round(page.Size.Width * scale);
             options.DestinationHeight = (uint)Math.Round(page.Size.Height * scale);
 
-            // Use PNG encoder for 100% lossless image quality and original file size preservation
-            options.BitmapEncodingId = BitmapDecoder.PngDecoderId;
+            // Use PNG decoder ID for 100% lossless image quality and original file size preservation
+            options.BitmapDecoderId = BitmapDecoder.PngDecoderId;
 
             using var inMemStream = new InMemoryRandomAccessStream();
             await page.RenderToStreamAsync(inMemStream, options);
