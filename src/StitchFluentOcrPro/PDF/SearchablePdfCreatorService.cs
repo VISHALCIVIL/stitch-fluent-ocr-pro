@@ -13,7 +13,7 @@ using StitchFluentOcrPro.Models;
 namespace StitchFluentOcrPro.PDF
 {
     /// <summary>
-    /// Constructs searchable sandwich PDFs by preserving original page images and overlaying calculated OCR text layers.
+    /// Constructs searchable sandwich PDFs by placing OCR text under original page images (Invisible Searchable Sandwich PDF standard).
     /// </summary>
     public class SearchablePdfCreatorService : ISearchablePdfCreatorService
     {
@@ -46,26 +46,7 @@ namespace StitchFluentOcrPro.PDF
                             pageResult.PageWidthPoints, 
                             pageResult.PageHeightPoints);
 
-                        // 1. Draw page image onto PDF background canvas
-                        if (pageResult.RenderedImageBytes != null && pageResult.RenderedImageBytes.Length > 0)
-                        {
-                            var placement = new PdfRectangle(
-                                0, 
-                                0, 
-                                pageResult.PageWidthPoints, 
-                                pageResult.PageHeightPoints);
-
-                            try
-                            {
-                                page.AddJpeg(pageResult.RenderedImageBytes, placement);
-                            }
-                            catch
-                            {
-                                page.AddPng(pageResult.RenderedImageBytes, placement);
-                            }
-                        }
-
-                        // 2. Add invisible OCR text layer matching exact word bounding boxes
+                        // 1. Place OCR text layer FIRST on canvas
                         foreach (var word in pageResult.Words)
                         {
                             if (string.IsNullOrWhiteSpace(word.Text)) continue;
@@ -96,11 +77,30 @@ namespace StitchFluentOcrPro.PDF
                                 catch { }
                             }
                         }
+
+                        // 2. Draw original page image ON TOP of text layer to make text completely invisible visually
+                        if (pageResult.RenderedImageBytes != null && pageResult.RenderedImageBytes.Length > 0)
+                        {
+                            var placement = new PdfRectangle(
+                                0, 
+                                0, 
+                                pageResult.PageWidthPoints, 
+                                pageResult.PageHeightPoints);
+
+                            try
+                            {
+                                page.AddJpeg(pageResult.RenderedImageBytes, placement);
+                            }
+                            catch
+                            {
+                                page.AddPng(pageResult.RenderedImageBytes, placement);
+                            }
+                        }
                     }
 
                     byte[] pdfBytes = builder.Build();
                     File.WriteAllBytes(outputPath, pdfBytes);
-                    _logger.LogInfo($"Successfully created searchable PDF: {outputPath}", "PDF");
+                    _logger.LogInfo($"Successfully created invisible searchable PDF: {outputPath}", "PDF");
                 }
                 catch (Exception ex)
                 {
