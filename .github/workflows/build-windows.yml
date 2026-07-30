@@ -23,8 +23,8 @@ jobs:
     - name: Install Inno Setup
       run: choco install innosetup --no-progress -y
 
-    - name: Restore Dependencies
-      run: dotnet restore StitchFluentOcrPro.sln
+    - name: Restore Project Dependencies
+      run: dotnet restore src/StitchFluentOcrPro/StitchFluentOcrPro.csproj
 
     - name: Run Unit Tests
       run: dotnet test tests/StitchFluentOcrPro.Tests/StitchFluentOcrPro.Tests.csproj -c Release
