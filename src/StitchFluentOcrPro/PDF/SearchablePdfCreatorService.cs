@@ -46,7 +46,7 @@ namespace StitchFluentOcrPro.PDF
                             pageResult.PageHeightPoints);
 
                         // 1. Draw page image onto PDF background canvas
-                        if (pageResult.RenderedImageBytes.Length > 0)
+                        if (pageResult.RenderedImageBytes != null && pageResult.RenderedImageBytes.Length > 0)
                         {
                             var placement = new PdfRectangle(
                                 0, 
@@ -54,8 +54,23 @@ namespace StitchFluentOcrPro.PDF
                                 pageResult.PageWidthPoints, 
                                 pageResult.PageHeightPoints);
 
-                            var addedImage = builder.AddImage(pageResult.RenderedImageBytes);
-                            page.AddImage(addedImage, placement);
+                            try
+                            {
+                                int imgW = (int)Math.Max(1, pageResult.ImageWidthPixels);
+                                int imgH = (int)Math.Max(1, pageResult.ImageHeightPixels);
+                                page.AddImage(pageResult.RenderedImageBytes, imgW, imgH, placement);
+                            }
+                            catch
+                            {
+                                try
+                                {
+                                    page.AddJpeg(pageResult.RenderedImageBytes, placement);
+                                }
+                                catch
+                                {
+                                    page.AddPng(pageResult.RenderedImageBytes, placement);
+                                }
+                            }
                         }
 
                         // 2. Add invisible OCR text layer matching exact word bounding boxes
