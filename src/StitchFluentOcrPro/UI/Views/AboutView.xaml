@@ -14,7 +14,7 @@
             <!-- App Details Card -->
             <Border Style="{StaticResource CardBorderStyle}">
                 <StackPanel>
-                    <TextBlock Text="System & Engine Architecture" Style="{StaticResource TitleMediumStyle}" Margin="0,0,0,16"/>
+                    <TextBlock Text="System &amp; Engine Architecture" Style="{StaticResource TitleMediumStyle}" Margin="0,0,0,16"/>
 
                     <Grid Margin="0,0,0,8">
                         <Grid.ColumnDefinitions>
@@ -48,7 +48,7 @@
                             <ColumnDefinition Width="200"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="PDF Rendering & Builder:" Style="{StaticResource BodyMediumStyle}" FontWeight="Bold"/>
+                        <TextBlock Text="PDF Rendering &amp; Builder:" Style="{StaticResource BodyMediumStyle}" FontWeight="Bold"/>
                         <TextBlock Grid.Column="1" Text="{Binding PdfEngineName}" Style="{StaticResource BodyMediumStyle}"/>
                     </Grid>
 
