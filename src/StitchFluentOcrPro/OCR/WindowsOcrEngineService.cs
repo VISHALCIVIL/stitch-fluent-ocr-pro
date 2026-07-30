@@ -16,7 +16,7 @@ namespace StitchFluentOcrPro.OCR
 {
     /// <summary>
     /// High-performance offline OCR engine wrapper over native Windows.Media.Ocr APIs.
-    /// Handles Windows OCR 2600-pixel dimension constraints automatically.
+    /// Encodes page images to compact JPEG streams to preserve original small file sizes.
     /// </summary>
     public class WindowsOcrEngineService : IOcrEngineService
     {
@@ -56,21 +56,21 @@ namespace StitchFluentOcrPro.OCR
                 PageHeightPoints = pageHeightPoints
             };
 
-            // Read stream into byte array for downstream PDF builder preservation
             if (imageStream.CanSeek)
             {
                 imageStream.Position = 0;
             }
-            using var ms = new MemoryStream();
-            await imageStream.CopyToAsync(ms);
-            pageResult.RenderedImageBytes = ms.ToArray();
 
-            // Create WinRT random access stream
+            using var rawMs = new MemoryStream();
+            await imageStream.CopyToAsync(rawMs);
+            byte[] rawBytes = rawMs.ToArray();
+
+            // Create WinRT random access stream for image decoding
             using IRandomAccessStream winRtStream = new InMemoryRandomAccessStream();
-            await winRtStream.WriteAsync(pageResult.RenderedImageBytes.AsBuffer());
+            await winRtStream.WriteAsync(rawBytes.AsBuffer());
             winRtStream.Seek(0);
 
-            // Decode image into SoftwareBitmap required by Windows.Media.Ocr
+            // Decode image into SoftwareBitmap
             BitmapDecoder decoder = await BitmapDecoder.CreateAsync(winRtStream);
             uint origWidth = decoder.PixelWidth;
             uint origHeight = decoder.PixelHeight;
@@ -111,6 +111,17 @@ namespace StitchFluentOcrPro.OCR
 
             using (softwareBitmap)
             {
+                // Re-encode to compact high-quality JPEG to keep output PDF file size small (~300KB)
+                using var jpegStream = new InMemoryRandomAccessStream();
+                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, jpegStream);
+                encoder.SetSoftwareBitmap(softwareBitmap);
+                await encoder.FlushAsync();
+
+                using var msJpeg = new MemoryStream();
+                jpegStream.Seek(0);
+                await jpegStream.AsStreamForRead().CopyToAsync(msJpeg);
+                pageResult.RenderedImageBytes = msJpeg.ToArray();
+
                 // Initialize Windows OcrEngine
                 OcrEngine? engine = null;
                 if (!string.IsNullOrWhiteSpace(languageTag))
