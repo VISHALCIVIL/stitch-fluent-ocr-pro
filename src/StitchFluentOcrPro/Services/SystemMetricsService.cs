@@ -17,17 +17,19 @@ namespace StitchFluentOcrPro.Services
 
         private void InitializeCpuCounter()
         {
-            if (OperatingSystem.IsWindows())
+            try
             {
-                try
+                if (OperatingSystem.IsWindows())
                 {
                     _cpuCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-                    _cpuCounter.NextValue(); // First call reads 0
+                    _cpuCounter.NextValue();
                 }
-                catch
-                {
-                    _counterFailed = true;
-                }
+            }
+            catch
+            {
+                _counterFailed = true;
+                _cpuCounter?.Dispose();
+                _cpuCounter = null;
             }
         }
 
@@ -35,7 +37,6 @@ namespace StitchFluentOcrPro.Services
         {
             if (_counterFailed || _cpuCounter == null || !OperatingSystem.IsWindows())
             {
-                // Fallback simulation based on system environment
                 return (float)(new Random().NextDouble() * 15.0 + 10.0);
             }
 
@@ -45,6 +46,7 @@ namespace StitchFluentOcrPro.Services
             }
             catch
             {
+                _counterFailed = true;
                 return 0.0f;
             }
         }
@@ -125,7 +127,11 @@ namespace StitchFluentOcrPro.Services
 
         public void Dispose()
         {
-            _cpuCounter?.Dispose();
+            try
+            {
+                _cpuCounter?.Dispose();
+            }
+            catch { }
             _cpuCounter = null;
         }
     }
