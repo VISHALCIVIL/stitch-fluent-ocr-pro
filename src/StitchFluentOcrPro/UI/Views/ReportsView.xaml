@@ -1,0 +1,91 @@
+<UserControl x:Class="StitchFluentOcrPro.UI.Views.ReportsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="850">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24">
+            <!-- Header -->
+            <TextBlock Text="Execution Reports" Style="{StaticResource DisplayLargeStyle}" Margin="0,0,0,8"/>
+            <TextBlock Text="Detailed post-processing metrics and downloadable execution reports." Style="{StaticResource BodyMediumStyle}" Margin="0,0,0,24"/>
+
+            <!-- Action Bar -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                <Button Content="Export JSON Report" Command="{Binding ExportJsonCommand}" Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,8,0"/>
+                <Button Content="Export CSV Summary" Command="{Binding ExportCsvCommand}" Style="{StaticResource SecondaryButtonStyle}"/>
+            </StackPanel>
+
+            <!-- Overview Card -->
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="Last Execution Metrics" Style="{StaticResource TitleMediumStyle}" Margin="0,0,0,16"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="TOTAL PAGES" Style="{StaticResource BodySmallStyle}"/>
+                            <TextBlock Text="{Binding CurrentReport.TotalPagesProcessed, TargetNullValue='0'}" Style="{StaticResource TitleMediumStyle}" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="AVERAGE THROUGHPUT" Style="{StaticResource BodySmallStyle}"/>
+                            <TextBlock Text="{Binding CurrentReport.AveragePagesPerMinute, StringFormat='{}{0:F1} PPM', TargetNullValue='0 PPM'}" Style="{StaticResource TitleMediumStyle}" Foreground="{StaticResource PrimaryBrush}" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="TOTAL DURATION" Style="{StaticResource BodySmallStyle}"/>
+                            <TextBlock Text="{Binding CurrentReport.TotalExecutionTime, StringFormat='{}{0:hh\\:mm\\:ss}', TargetNullValue='00:00:00'}" Style="{StaticResource TitleMediumStyle}" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="3">
+                            <TextBlock Text="DATA PROCESSED" Style="{StaticResource BodySmallStyle}"/>
+                            <TextBlock Text="{Binding CurrentReport.TotalBytesProcessed, Converter={StaticResource BytesConverter}, TargetNullValue='0 B'}" Style="{StaticResource TitleMediumStyle}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- File Breakdown Card -->
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="File Status Breakdown" Style="{StaticResource TitleMediumStyle}" Margin="0,0,0,16"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Total Files" Style="{StaticResource BodySmallStyle}"/>
+                            <TextBlock Text="{Binding CurrentReport.TotalFiles, TargetNullValue='0'}" Style="{StaticResource TitleMediumStyle}" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Successful" Style="{StaticResource BodySmallStyle}"/>
+                            <TextBlock Text="{Binding CurrentReport.SuccessfulFiles, TargetNullValue='0'}" Style="{StaticResource TitleMediumStyle}" Foreground="{StaticResource SuccessBrush}" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="Skipped" Style="{StaticResource BodySmallStyle}"/>
+                            <TextBlock Text="{Binding CurrentReport.SkippedFiles, TargetNullValue='0'}" Style="{StaticResource TitleMediumStyle}" Foreground="{StaticResource OnSurfaceVariantBrush}" Margin="0,4,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="3">
+                            <TextBlock Text="Failed" Style="{StaticResource BodySmallStyle}"/>
+                            <TextBlock Text="{Binding CurrentReport.FailedFiles, TargetNullValue='0'}" Style="{StaticResource TitleMediumStyle}" Foreground="{StaticResource ErrorBrush}" Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

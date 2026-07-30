@@ -1,0 +1,107 @@
+<Window x:Class="StitchFluentOcrPro.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:StitchFluentOcrPro.ViewModels"
+        xmlns:views="clr-namespace:StitchFluentOcrPro.UI.Views"
+        mc:Ignorable="d"
+        Title="Stitch Fluent OCR Pro - Windows 11 Offline Searchable PDF Engine" 
+        Height="760" Width="1180"
+        MinHeight="600" MinWidth="900"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BackgroundBrush}">
+
+    <Window.Resources>
+        <!-- ViewModel to View Mapping DataTemplates -->
+        <DataTemplate DataType="{x:Type vm:DashboardViewModel}">
+            <views:DashboardView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ProcessPdfViewModel}">
+            <views:ProcessPdfView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:QueueViewModel}">
+            <views:QueueView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:LogsViewModel}">
+            <views:LogsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ReportsViewModel}">
+            <views:ReportsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AboutViewModel}">
+            <views:AboutView/>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Navigation Rail (Left Sidebar) -->
+        <Border Grid.Column="0" Background="#F0F0F0" BorderBrush="{StaticResource OutlineBrush}" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- App Logo & Brand Header -->
+                <StackPanel Grid.Row="0" Margin="16,20,16,16">
+                    <TextBlock Text="Stitch OCR Pro" Style="{StaticResource TitleMediumStyle}" Foreground="{StaticResource PrimaryBrush}"/>
+                    <TextBlock Text="Windows 11 Engine" Style="{StaticResource BodySmallStyle}"/>
+                </StackPanel>
+
+                <!-- Navigation Rail Buttons -->
+                <StackPanel Grid.Row="1" Margin="8,0">
+                    <RadioButton Content="Dashboard" 
+                                 Command="{Binding NavigateDashboardCommand}" 
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Dashboard}"
+                                 Style="{StaticResource NavRailItemButtonStyle}"/>
+
+                    <RadioButton Content="Process PDFs" 
+                                 Command="{Binding NavigateProcessPdfCommand}" 
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Process PDFs}"
+                                 Style="{StaticResource NavRailItemButtonStyle}"/>
+
+                    <RadioButton Content="Queue" 
+                                 Command="{Binding NavigateQueueCommand}" 
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Queue}"
+                                 Style="{StaticResource NavRailItemButtonStyle}"/>
+
+                    <RadioButton Content="Logs" 
+                                 Command="{Binding NavigateLogsCommand}" 
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Logs}"
+                                 Style="{StaticResource NavRailItemButtonStyle}"/>
+
+                    <RadioButton Content="Reports" 
+                                 Command="{Binding NavigateReportsCommand}" 
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Reports}"
+                                 Style="{StaticResource NavRailItemButtonStyle}"/>
+                </StackPanel>
+
+                <!-- Bottom Navigation Settings & About -->
+                <StackPanel Grid.Row="2" Margin="8,0,8,16">
+                    <RadioButton Content="Settings" 
+                                 Command="{Binding NavigateSettingsCommand}" 
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Settings}"
+                                 Style="{StaticResource NavRailItemButtonStyle}"/>
+
+                    <RadioButton Content="About" 
+                                 Command="{Binding NavigateAboutCommand}" 
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=About}"
+                                 Style="{StaticResource NavRailItemButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content Area -->
+        <ContentControl Grid.Column="1" Content="{Binding CurrentView}"/>
+    </Grid>
+</Window>

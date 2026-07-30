@@ -1,0 +1,66 @@
+<UserControl x:Class="StitchFluentOcrPro.UI.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="650" d:DesignWidth="850">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24">
+            <!-- Header -->
+            <TextBlock Text="Settings" Style="{StaticResource DisplayLargeStyle}" Margin="0,0,0,8"/>
+            <TextBlock Text="Configure OCR engine parameters, performance concurrency, and system preferences." Style="{StaticResource BodyMediumStyle}" Margin="0,0,0,24"/>
+
+            <!-- Performance Card -->
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="Performance & Concurrency" Style="{StaticResource TitleMediumStyle}" Margin="0,0,0,16"/>
+
+                    <!-- Max Worker Slider -->
+                    <Grid Margin="0,0,0,16">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <TextBlock Text="Max Parallel Worker Threads" Style="{StaticResource BodyMediumStyle}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding MaxParallelWorkers, StringFormat='{}{0} Cores'}" Style="{StaticResource BodyMediumStyle}" FontWeight="Bold" HorizontalAlignment="Right" Foreground="{StaticResource PrimaryBrush}"/>
+                        </Grid>
+                        <Slider Grid.Row="1" Minimum="1" Maximum="{Binding MaxCpuCores}" Value="{Binding MaxParallelWorkers, Mode=TwoWay}" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,8,0,0"/>
+                    </Grid>
+
+                    <!-- Render DPI -->
+                    <TextBlock Text="PDF Rendering DPI Resolution" Style="{StaticResource BodyMediumStyle}" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <ComboBox ItemsSource="{Binding DpiOptions}" SelectedItem="{Binding RenderDpi, Mode=TwoWay}" Height="36" Width="200" HorizontalAlignment="Left" Margin="0,0,0,16"/>
+                </StackPanel>
+            </Border>
+
+            <!-- OCR Engine Card -->
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="OCR Engine Settings" Style="{StaticResource TitleMediumStyle}" Margin="0,0,0,16"/>
+
+                    <!-- Windows OCR Language Picker -->
+                    <TextBlock Text="Windows OCR Recognizer Language" Style="{StaticResource BodyMediumStyle}" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <ComboBox ItemsSource="{Binding AvailableLanguages}" SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}" Height="36" Width="250" HorizontalAlignment="Left" Margin="0,0,0,16"/>
+
+                    <!-- Toggles -->
+                    <CheckBox Content="Skip already processed PDF files if output file exists" IsChecked="{Binding SkipExistingFiles, Mode=TwoWay}" Style="{StaticResource BodyMediumStyle}" Margin="0,0,0,12"/>
+                    <CheckBox Content="Preserve original PDF document metadata and bookmarks" IsChecked="{Binding PreserveMetadata, Mode=TwoWay}" Style="{StaticResource BodyMediumStyle}" Margin="0,0,0,12"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Theme Card -->
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="Appearance & Theme" Style="{StaticResource TitleMediumStyle}" Margin="0,0,0,16"/>
+                    <TextBlock Text="App Theme Mode" Style="{StaticResource BodyMediumStyle}" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <ComboBox ItemsSource="{Binding ThemeOptions}" SelectedItem="{Binding SelectedTheme, Mode=TwoWay}" Height="36" Width="200" HorizontalAlignment="Left" Margin="0,0,0,16"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Save Action Button -->
+            <Button Content="Save Configuration" Command="{Binding SaveCommand}" Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Left"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

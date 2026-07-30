@@ -1,0 +1,49 @@
+name: Build Windows Self-Contained Installer
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET 8 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Install Inno Setup
+      run: choco install innosetup --no-progress -y
+
+    - name: Restore Dependencies
+      run: dotnet restore StitchFluentOcrPro.sln
+
+    - name: Run Unit Tests
+      run: dotnet test tests/StitchFluentOcrPro.Tests/StitchFluentOcrPro.Tests.csproj -c Release
+
+    - name: Publish Self-Contained Executable (win-x64)
+      run: dotnet publish src/StitchFluentOcrPro/StitchFluentOcrPro.csproj -c Release -r win-x64 --self-contained true
+
+    - name: Compile Inno Setup Installer (.exe)
+      run: |
+        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" Setup.iss
+
+    - name: Upload Published Executable Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: StitchFluentOcrPro-Portable-win-x64
+        path: src/StitchFluentOcrPro/publish/
+
+    - name: Upload Windows Setup Installer Artifact (.exe)
+      uses: actions/upload-artifact@v4
+      with:
+        name: StitchFluentOcrPro-Setup-Installer
+        path: installer/Output/StitchFluentOcrPro_Setup_v1.0.0.exe

@@ -1,0 +1,89 @@
+<UserControl x:Class="StitchFluentOcrPro.UI.Views.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="850">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24">
+            <!-- Header -->
+            <TextBlock Text="Stitch Fluent OCR Pro" Style="{StaticResource DisplayLargeStyle}" Margin="0,0,0,4"/>
+            <TextBlock Text="High-Performance Offline Searchable PDF Engine" Style="{StaticResource TitleMediumStyle}" Foreground="{StaticResource PrimaryBrush}" Margin="0,0,0,24"/>
+
+            <!-- App Details Card -->
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="System & Engine Architecture" Style="{StaticResource TitleMediumStyle}" Margin="0,0,0,16"/>
+
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Application Version:" Style="{StaticResource BodyMediumStyle}" FontWeight="Bold"/>
+                        <TextBlock Grid.Column="1" Text="{Binding AppVersion}" Style="{StaticResource BodyMediumStyle}"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Target Framework:" Style="{StaticResource BodyMediumStyle}" FontWeight="Bold"/>
+                        <TextBlock Grid.Column="1" Text="{Binding TargetFramework}" Style="{StaticResource BodyMediumStyle}"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="OCR Recognizer Engine:" Style="{StaticResource BodyMediumStyle}" FontWeight="Bold"/>
+                        <TextBlock Grid.Column="1" Text="{Binding OcrEngineName}" Style="{StaticResource BodyMediumStyle}"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="PDF Rendering & Builder:" Style="{StaticResource BodyMediumStyle}" FontWeight="Bold"/>
+                        <TextBlock Grid.Column="1" Text="{Binding PdfEngineName}" Style="{StaticResource BodyMediumStyle}"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Architecture Pattern:" Style="{StaticResource BodyMediumStyle}" FontWeight="Bold"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Architecture}" Style="{StaticResource BodyMediumStyle}"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Logical CPU Cores:" Style="{StaticResource BodyMediumStyle}" FontWeight="Bold"/>
+                        <TextBlock Grid.Column="1" Text="{Binding LogicalCpuCores}" Style="{StaticResource BodyMediumStyle}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Features Card -->
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="Key Features" Style="{StaticResource TitleMediumStyle}" Margin="0,0,0,12"/>
+                    <TextBlock Text="• 100% Offline OCR powered by native Windows.Media.Ocr APIs." Style="{StaticResource BodyMediumStyle}" Margin="0,0,0,6"/>
+                    <TextBlock Text="• High-precision coordinate conversion from image pixels to 72 DPI PDF point space." Style="{StaticResource BodyMediumStyle}" Margin="0,0,0,6"/>
+                    <TextBlock Text="• Invisible text overlay layer creation matching Adobe Acrobat &amp; Edge searchable standard." Style="{StaticResource BodyMediumStyle}" Margin="0,0,0,6"/>
+                    <TextBlock Text="• Parallel batch processing with Pause/Resume and Cancellation support." Style="{StaticResource BodyMediumStyle}" Margin="0,0,0,6"/>
+                    <TextBlock Text="• Subfolder structure preservation and automatic skip of existing files." Style="{StaticResource BodyMediumStyle}" Margin="0,0,0,6"/>
+                    <TextBlock Text="• Handles 10 GB+ PDF files and thousands of pages without memory leaks." Style="{StaticResource BodyMediumStyle}"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

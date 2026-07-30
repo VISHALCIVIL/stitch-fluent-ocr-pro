@@ -1,0 +1,22 @@
+<Application x:Class="StitchFluentOcrPro.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:StitchFluentOcrPro.UI.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="UI/Styles/Colors.xaml"/>
+                <ResourceDictionary Source="UI/Styles/Typography.xaml"/>
+                <ResourceDictionary Source="UI/Styles/Buttons.xaml"/>
+                <ResourceDictionary Source="UI/Styles/Cards.xaml"/>
+                <ResourceDictionary Source="UI/Styles/NavRail.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Application Global Value Converters -->
+            <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
+            <converters:BytesToHumanReadableConverter x:Key="BytesConverter"/>
+            <converters:InverseBooleanConverter x:Key="InverseBoolConverter"/>
+            <converters:EnumToBooleanConverter x:Key="EnumToBoolConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

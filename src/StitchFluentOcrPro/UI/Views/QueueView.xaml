@@ -1,0 +1,92 @@
+<UserControl x:Class="StitchFluentOcrPro.UI.Views.QueueView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="900">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="Job Queue" Style="{StaticResource DisplayLargeStyle}" Margin="0,0,0,8"/>
+
+        <!-- Search & Filter Controls -->
+        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0" 
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="36" 
+                         Padding="8,6" 
+                         VerticalContentAlignment="Center"/>
+
+                <ComboBox Grid.Column="1" 
+                          SelectedValue="{Binding SelectedFilter, Mode=TwoWay}"
+                          SelectedValuePath="Content"
+                          Height="36" 
+                          Width="140" 
+                          Margin="12,0,0,0">
+                    <ComboBoxItem Content="All"/>
+                    <ComboBoxItem Content="Queued"/>
+                    <ComboBoxItem Content="Processing"/>
+                    <ComboBoxItem Content="Completed"/>
+                    <ComboBoxItem Content="Failed"/>
+                    <ComboBoxItem Content="Skipped"/>
+                </ComboBox>
+            </Grid>
+        </Border>
+
+        <!-- DataGrid Queue Table -->
+        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Padding="0">
+            <DataGrid ItemsSource="{Binding FilteredJobs}" 
+                      AutoGenerateColumns="False" 
+                      IsReadOnly="True"
+                      GridLinesVisibility="Horizontal"
+                      HorizontalGridLinesBrush="{StaticResource OutlineBrush}"
+                      BorderThickness="0"
+                      Background="Transparent"
+                      RowHeight="36">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="File Name" Binding="{Binding FileName}" Width="2*"/>
+                    <DataGridTextColumn Header="Relative Path" Binding="{Binding RelativeDirectory}" Width="1.5*"/>
+                    
+                    <!-- Status Column with Color Badge -->
+                    <DataGridTemplateColumn Header="Status" Width="110">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Background="{Binding Status, Converter={StaticResource StatusToColorConverter}}" 
+                                        CornerRadius="4" 
+                                        Padding="8,2" 
+                                        HorizontalAlignment="Left" 
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Status}" Foreground="White" FontSize="11" FontWeight="Bold"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Header="Pages" Binding="{Binding ProcessedPages}" Width="70"/>
+                    <DataGridTextColumn Header="Size" Binding="{Binding FileSizeBytes, Converter={StaticResource BytesConverter}}" Width="90"/>
+
+                    <!-- Progress Bar Column -->
+                    <DataGridTemplateColumn Header="Progress" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ProgressBar Value="{Binding ProgressPercentage}" Maximum="100" Height="8" Foreground="{StaticResource PrimaryBrush}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</UserControl>

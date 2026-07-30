@@ -1,0 +1,71 @@
+<UserControl x:Class="StitchFluentOcrPro.UI.Views.LogsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="850">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="System Logs" Style="{StaticResource DisplayLargeStyle}" Margin="0,0,0,8"/>
+
+        <!-- Log Filters & Actions -->
+        <Border Grid.Row="1" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBox Grid.Column="0" 
+                         Text="{Binding LogSearchQuery, UpdateSourceTrigger=PropertyChanged}" 
+                         Height="36" 
+                         Padding="8,6" 
+                         VerticalContentAlignment="Center"/>
+
+                <ComboBox Grid.Column="1" 
+                          SelectedValue="{Binding SelectedLogLevel, Mode=TwoWay}"
+                          SelectedValuePath="Content"
+                          Height="36" 
+                          Width="120" 
+                          Margin="8,0,0,0">
+                    <ComboBoxItem Content="All"/>
+                    <ComboBoxItem Content="Info"/>
+                    <ComboBoxItem Content="Warning"/>
+                    <ComboBoxItem Content="Error"/>
+                    <ComboBoxItem Content="Debug"/>
+                </ComboBox>
+
+                <Button Grid.Column="2" Content="Clear" Command="{Binding ClearLogsCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="8,0,0,0"/>
+                <Button Grid.Column="3" Content="Export Logs" Command="{Binding ExportLogsCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="8,0,0,0"/>
+            </Grid>
+        </Border>
+
+        <!-- Log Feed Box -->
+        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}" Padding="8" Background="#1A1C1C">
+            <ListBox ItemsSource="{Binding Logs}" 
+                     Background="Transparent" 
+                     BorderThickness="0"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                            <TextBlock Text="{Binding FormattedTimestamp}" Style="{StaticResource MonoDataStyle}" Foreground="#888888" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding Level, StringFormat='[{0}]'}" Style="{StaticResource MonoDataStyle}" Foreground="#0078D4" FontWeight="Bold" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding Category, StringFormat='[{0}]'}" Style="{StaticResource MonoDataStyle}" Foreground="#AAAAAA" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding Message}" Style="{StaticResource MonoDataStyle}" Foreground="#FFFFFF" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+    </Grid>
+</UserControl>
