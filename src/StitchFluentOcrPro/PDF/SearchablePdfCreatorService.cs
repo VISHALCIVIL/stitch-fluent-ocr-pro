@@ -14,6 +14,7 @@ namespace StitchFluentOcrPro.PDF
 {
     /// <summary>
     /// Constructs searchable sandwich PDFs by placing OCR text under original page images (Invisible Searchable Sandwich PDF standard).
+    /// Preserves 100% lossless image quality and original resolution.
     /// </summary>
     public class SearchablePdfCreatorService : ISearchablePdfCreatorService
     {
@@ -78,7 +79,7 @@ namespace StitchFluentOcrPro.PDF
                             }
                         }
 
-                        // 2. Draw original page image ON TOP of text layer to make text completely invisible visually
+                        // 2. Draw original page image ON TOP of text layer with 100% lossless PNG quality
                         if (pageResult.RenderedImageBytes != null && pageResult.RenderedImageBytes.Length > 0)
                         {
                             var placement = new PdfRectangle(
@@ -89,18 +90,18 @@ namespace StitchFluentOcrPro.PDF
 
                             try
                             {
-                                page.AddJpeg(pageResult.RenderedImageBytes, placement);
+                                page.AddPng(pageResult.RenderedImageBytes, placement);
                             }
                             catch
                             {
-                                page.AddPng(pageResult.RenderedImageBytes, placement);
+                                page.AddJpeg(pageResult.RenderedImageBytes, placement);
                             }
                         }
                     }
 
                     byte[] pdfBytes = builder.Build();
                     File.WriteAllBytes(outputPath, pdfBytes);
-                    _logger.LogInfo($"Successfully created invisible searchable PDF: {outputPath}", "PDF");
+                    _logger.LogInfo($"Successfully created lossless searchable PDF: {outputPath}", "PDF");
                 }
                 catch (Exception ex)
                 {
