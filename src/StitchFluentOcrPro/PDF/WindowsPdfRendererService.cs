@@ -2,14 +2,13 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.Data.Pdf;
-using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using StitchFluentOcrPro.Logging;
 
 namespace StitchFluentOcrPro.PDF
 {
     /// <summary>
-    /// High-speed native PDF rendering service using Windows.Data.Pdf APIs with lossless PNG quality.
+    /// High-speed native PDF rendering service using Windows.Data.Pdf APIs with lossless PNG stream quality.
     /// </summary>
     public class WindowsPdfRendererService : IPdfRendererService
     {
@@ -48,9 +47,6 @@ namespace StitchFluentOcrPro.PDF
             double scale = dpi / 72.0;
             options.DestinationWidth = (uint)Math.Round(page.Size.Width * scale);
             options.DestinationHeight = (uint)Math.Round(page.Size.Height * scale);
-
-            // Use PNG decoder ID for 100% lossless image quality and original file size preservation
-            options.BitmapDecoderId = BitmapDecoder.PngDecoderId;
 
             using var inMemStream = new InMemoryRandomAccessStream();
             await page.RenderToStreamAsync(inMemStream, options);
