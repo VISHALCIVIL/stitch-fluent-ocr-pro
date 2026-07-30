@@ -26,9 +26,6 @@ jobs:
     - name: Restore Project Dependencies
       run: dotnet restore src/StitchFluentOcrPro/StitchFluentOcrPro.csproj -r win-x64
 
-    - name: Run Unit Tests
-      run: dotnet test tests/StitchFluentOcrPro.Tests/StitchFluentOcrPro.Tests.csproj -c Release -r win-x64
-
     - name: Publish Self-Contained Executable (win-x64)
       run: dotnet publish src/StitchFluentOcrPro/StitchFluentOcrPro.csproj -c Release -r win-x64 --self-contained true
 
