@@ -61,41 +61,48 @@
                 <!-- Navigation Rail Buttons -->
                 <StackPanel Grid.Row="1" Margin="8,0">
                     <RadioButton Content="Dashboard" 
+                                 GroupName="NavRail"
                                  Command="{Binding NavigateDashboardCommand}" 
-                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Dashboard}"
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Dashboard, Mode=OneWay}"
                                  Style="{StaticResource NavRailItemButtonStyle}"/>
 
                     <RadioButton Content="Process PDFs" 
+                                 GroupName="NavRail"
                                  Command="{Binding NavigateProcessPdfCommand}" 
-                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Process PDFs}"
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Process PDFs, Mode=OneWay}"
                                  Style="{StaticResource NavRailItemButtonStyle}"/>
 
                     <RadioButton Content="Queue" 
+                                 GroupName="NavRail"
                                  Command="{Binding NavigateQueueCommand}" 
-                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Queue}"
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Queue, Mode=OneWay}"
                                  Style="{StaticResource NavRailItemButtonStyle}"/>
 
                     <RadioButton Content="Logs" 
+                                 GroupName="NavRail"
                                  Command="{Binding NavigateLogsCommand}" 
-                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Logs}"
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Logs, Mode=OneWay}"
                                  Style="{StaticResource NavRailItemButtonStyle}"/>
 
                     <RadioButton Content="Reports" 
+                                 GroupName="NavRail"
                                  Command="{Binding NavigateReportsCommand}" 
-                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Reports}"
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Reports, Mode=OneWay}"
                                  Style="{StaticResource NavRailItemButtonStyle}"/>
                 </StackPanel>
 
                 <!-- Bottom Navigation Settings & About -->
                 <StackPanel Grid.Row="2" Margin="8,0,8,16">
                     <RadioButton Content="Settings" 
+                                 GroupName="NavRail"
                                  Command="{Binding NavigateSettingsCommand}" 
-                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Settings}"
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Settings, Mode=OneWay}"
                                  Style="{StaticResource NavRailItemButtonStyle}"/>
 
                     <RadioButton Content="About" 
+                                 GroupName="NavRail"
                                  Command="{Binding NavigateAboutCommand}" 
-                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=About}"
+                                 IsChecked="{Binding ActivePageName, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=About, Mode=OneWay}"
                                  Style="{StaticResource NavRailItemButtonStyle}"/>
                 </StackPanel>
             </Grid>

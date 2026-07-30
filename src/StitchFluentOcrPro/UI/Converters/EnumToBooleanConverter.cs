@@ -16,7 +16,11 @@ namespace StitchFluentOcrPro.UI.Converters
         {
             if (value is bool b && b && parameter != null)
             {
-                return Enum.Parse(targetType, parameter.ToString()!);
+                if (targetType.IsEnum)
+                {
+                    return Enum.Parse(targetType, parameter.ToString()!);
+                }
+                return parameter.ToString()!;
             }
             return Binding.DoNothing;
         }
