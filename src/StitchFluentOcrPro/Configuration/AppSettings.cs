@@ -8,7 +8,7 @@ namespace StitchFluentOcrPro.Configuration
         public string InputFolder { get; set; } = string.Empty;
         public string OutputFolder { get; set; } = string.Empty;
         public int MaxDegreeOfParallelism { get; set; } = System.Environment.ProcessorCount;
-        public int RenderDpi { get; set; } = 300;
+        public int RenderDpi { get; set; } = 150; // Optimized 150 DPI default for 4x faster OCR speed
         public string SelectedLanguageTag { get; set; } = "en-US";
         public bool SkipExistingFiles { get; set; } = true;
         public bool PreserveOriginalMetadata { get; set; } = true;

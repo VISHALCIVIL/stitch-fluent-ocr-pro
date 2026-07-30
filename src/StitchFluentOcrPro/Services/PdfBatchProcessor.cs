@@ -58,7 +58,7 @@ namespace StitchFluentOcrPro.Services
             IsPaused = false;
             var stopwatch = Stopwatch.StartNew();
 
-            _logger.LogInfo($"Starting batch processing of {jobs.Count} PDF jobs.", "Engine");
+            _logger.LogInfo($"Starting high-performance batch processing of {jobs.Count} PDF jobs.", "Engine");
 
             int activeWorkers = 0;
             int totalProcessedPages = 0;
@@ -68,7 +68,7 @@ namespace StitchFluentOcrPro.Services
             var pendingJobs = jobs.Where(j => j.Status == JobStatus.Queued).ToList();
 
             int maxConcurrency = Math.Max(1, _configService.Settings.MaxDegreeOfParallelism);
-            int dpi = Math.Clamp(_configService.Settings.RenderDpi, 150, 600);
+            int dpi = Math.Clamp(_configService.Settings.RenderDpi, 100, 300);
             string langTag = _configService.Settings.SelectedLanguageTag;
 
             var parallelOptions = new ParallelOptions
@@ -125,7 +125,7 @@ namespace StitchFluentOcrPro.Services
                     job.Status = JobStatus.Processing;
                     job.StartTime = DateTime.Now;
 
-                    _logger.LogInfo($"[Worker] Starting OCR on file: {job.FileName}", "Engine");
+                    _logger.LogInfo($"[Worker] Starting parallel OCR on file: {job.FileName}", "Engine");
 
                     try
                     {
@@ -134,13 +134,20 @@ namespace StitchFluentOcrPro.Services
                         job.TotalPages = pageCount;
                         Interlocked.Add(ref grandTotalPages, pageCount);
 
-                        var pageResults = new List<OcrPageResult>();
+                        var pageResultsArray = new OcrPageResult[pageCount];
+                        var pageIndices = Enumerable.Range(0, pageCount).ToList();
 
-                        // 2. Process Page-by-Page
-                        for (int pIndex = 0; pIndex < pageCount; pIndex++)
+                        // 2. High-speed Parallel Page Processing across CPU cores
+                        var pageParallelOptions = new ParallelOptions
                         {
-                            ct.ThrowIfCancellationRequested();
-                            await pauseToken.WaitWhilePausedAsync(ct);
+                            MaxDegreeOfParallelism = maxConcurrency,
+                            CancellationToken = ct
+                        };
+
+                        await Parallel.ForEachAsync(pageIndices, pageParallelOptions, async (pIndex, pageCt) =>
+                        {
+                            pageCt.ThrowIfCancellationRequested();
+                            await pauseToken.WaitWhilePausedAsync(pageCt);
 
                             var (wPts, hPts) = await _pdfRenderer.GetPageDimensionsAsync(job.InputPath, pIndex);
                             using var imgStream = await _pdfRenderer.RenderPageToImageStreamAsync(job.InputPath, pIndex, dpi);
@@ -152,11 +159,13 @@ namespace StitchFluentOcrPro.Services
                                 hPts, 
                                 langTag);
 
-                            pageResults.Add(pageOcr);
+                            pageResultsArray[pIndex] = pageOcr;
 
                             job.ProcessedPages++;
                             Interlocked.Increment(ref totalProcessedPages);
-                        }
+                        });
+
+                        var pageResults = pageResultsArray.Where(p => p != null).OrderBy(p => p.PageIndex).ToList();
 
                         // 3. Construct Searchable PDF Output
                         await _pdfCreator.CreateSearchablePdfAsync(job.OutputPath, pageResults);
@@ -167,7 +176,7 @@ namespace StitchFluentOcrPro.Services
 
                         _logger.LogInfo($"[Worker] Successfully completed: {job.FileName} ({pageCount} pages, {job.Duration.TotalSeconds:F1}s)", "Engine");
 
-                        // Explicit cleanups to ensure zero memory leaks on large runs
+                        // Cleanups
                         pageResults.Clear();
                         GC.Collect(0, GCCollectionMode.Optimized, false);
                     }
