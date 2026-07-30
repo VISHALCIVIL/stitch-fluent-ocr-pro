@@ -1,15 +1,33 @@
 @echo off
-echo [1/2] Restoring and Publishing Stitch Fluent OCR Pro (win-x64 Self-Contained)...
-dotnet publish src\StitchFluentOcrPro\StitchFluentOcrPro.csproj -c Release -r win-x64 --self-contained true
+cd /d "%~dp0"
+echo ===================================================
+echo Stitch Fluent OCR Pro - Build & Publish Script
+echo ===================================================
+echo.
 
-if %ERRORLEVEL% EQU 0 (
+echo Restoring dependencies and publishing self-contained executable...
+dotnet publish "src/StitchFluentOcrPro/StitchFluentOcrPro.csproj" -c Release -r win-x64 --self-contained true -o "%~dp0src\StitchFluentOcrPro\publish"
+
+if %ERRORLEVEL% NEQ 0 (
     echo.
-    echo ======================================================================
-    echo SUCCESS: Published self-contained build to src\StitchFluentOcrPro\publish\
-    echo You can now compile Setup.iss in Inno Setup to create the installer.
-    echo ======================================================================
-) else (
-    echo.
-    echo ERROR: Build failed. Please check log messages above.
+    echo [ERROR] Build or Publish failed! Please check error output above.
+    pause
+    exit /b %ERRORLEVEL%
 )
+
+echo.
+echo ===================================================
+echo [SUCCESS] Application published successfully!
+echo Published output location:
+echo %~dp0src\StitchFluentOcrPro\publish\
+echo ===================================================
+echo.
+
+if exist "%~dp0src\StitchFluentOcrPro\publish" (
+    echo Opening published folder in File Explorer...
+    explorer "%~dp0src\StitchFluentOcrPro\publish"
+) else (
+    echo [WARNING] Published folder was not found at %~dp0src\StitchFluentOcrPro\publish
+)
+
 pause
