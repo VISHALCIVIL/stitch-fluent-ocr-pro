@@ -54,8 +54,7 @@ namespace StitchFluentOcrPro.PDF
                                 pageResult.PageWidthPoints, 
                                 pageResult.PageHeightPoints);
 
-                            var addedImage = builder.AddImage(pageResult.RenderedImageBytes);
-                            page.AddImage(addedImage, placement);
+                            page.AddImage(pageResult.RenderedImageBytes, placement);
                         }
 
                         // 2. Add invisible OCR text layer matching exact word bounding boxes
